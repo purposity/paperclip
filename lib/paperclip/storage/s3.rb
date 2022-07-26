@@ -229,6 +229,12 @@ module Paperclip
         @bucket = @bucket.call(self) if @bucket.respond_to?(:call)
         @bucket or raise ArgumentError, "missing required :bucket option"
       end
+      
+      def endpoint
+        @endpoint = @options[:endpoint] || s3_credentials[:endpoint]
+        @endpoint = @endpoint.call(self) if @endpoint.respond_to?(:call)
+        @endpoint
+      end
 
       def s3_interface
         @s3_interface ||= begin
@@ -247,6 +253,10 @@ module Paperclip
           end
 
           config[:use_accelerate_endpoint] = use_accelerate_endpoint?
+          
+          if using_endpoint?
+            config[:endpoint] = endpoint
+          end
 
           [:access_key_id, :secret_access_key, :credential_provider, :credentials].each do |opt|
             config[opt] = s3_credentials[opt] if s3_credentials[opt]
@@ -277,6 +287,10 @@ module Paperclip
         !!@use_accelerate_endpoint
       end
 
+      def using_endpoint?
+        !!@endpoint
+      end
+      
       def using_http_proxy?
         !!@http_proxy
       end
