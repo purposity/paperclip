@@ -253,10 +253,8 @@ module Paperclip
           end
 
           config[:use_accelerate_endpoint] = use_accelerate_endpoint?
-          
-          if using_endpoint?
-            config[:endpoint] = endpoint
-          end
+
+          config[:endpoint] = endpoint if endpoint
 
           [:access_key_id, :secret_access_key, :credential_provider, :credentials].each do |opt|
             config[opt] = s3_credentials[opt] if s3_credentials[opt]
@@ -285,10 +283,6 @@ module Paperclip
 
       def use_accelerate_endpoint?
         !!@use_accelerate_endpoint
-      end
-
-      def using_endpoint?
-        !!@endpoint
       end
       
       def using_http_proxy?
